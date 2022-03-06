@@ -32,8 +32,8 @@ fn solution_with_monitor() {
                 }
 
                 println!("print no {no}!");
-                assert_eq!(no, ans.load(Ordering::SeqCst));
-                ans.fetch_add(1, Ordering::SeqCst);
+                let ans = ans.fetch_add(1, Ordering::SeqCst);
+                assert_eq!(no, ans);
 
                 *g += 1;
                 // every one who got the right anwser just notify others
@@ -63,8 +63,8 @@ fn solution_with_semaphore() {
                     1 => {
                         // when the no 1 thread coming, we directly print it.
                         println!("print no {no}!");
-                        assert_eq!(no, ans.load(Ordering::SeqCst));
-                        ans.fetch_add(1, Ordering::SeqCst);
+                        let ans = ans.fetch_add(1, Ordering::SeqCst);
+                        assert_eq!(no, ans);
 
                         // and then release the semaphore one
                         s.release();
@@ -74,8 +74,8 @@ fn solution_with_semaphore() {
                         s.acquire();
 
                         println!("print no {no}!");
-                        assert_eq!(no, ans.load(Ordering::SeqCst));
-                        ans.fetch_add(1, Ordering::SeqCst);
+                        let ans = ans.fetch_add(1, Ordering::SeqCst);
+                        assert_eq!(no, ans);
 
                         // last we release the s2 for no 3 printing
                         s2.release();
@@ -85,8 +85,8 @@ fn solution_with_semaphore() {
                         s2.acquire();
 
                         println!("print no {no}!");
-                        assert_eq!(no, ans.load(Ordering::SeqCst));
-                        ans.fetch_add(1, Ordering::SeqCst);
+                        let ans = ans.fetch_add(1, Ordering::SeqCst);
+                        assert_eq!(no, ans);
                     }
                     _ => unreachable!(),
                 }
