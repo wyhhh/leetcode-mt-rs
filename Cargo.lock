@@ -24,6 +24,7 @@ name = "leetcode-mt-rs"
 version = "0.1.0"
 dependencies = [
  "rand",
+ "std-semaphore",
 ]
 
 [[package]]
@@ -67,6 +68,12 @@ checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
 dependencies = [
  "getrandom",
 ]
+
+[[package]]
+name = "std-semaphore"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33ae9eec00137a8eed469fb4148acd9fc6ac8c3f9b110f52cd34698c8b5bfa0e"
 
 [[package]]
 name = "wasi"
