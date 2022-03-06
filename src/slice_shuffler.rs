@@ -3,6 +3,7 @@ use rand::prelude::SliceRandom;
 use rand::thread_rng;
 use std::slice::Iter;
 use std::thread;
+
 pub struct SliceShuffler<'a, T> {
     slice: &'a mut [T],
 }

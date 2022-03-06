@@ -4,12 +4,14 @@ use leetcode_mt_rs::Monitor;
 use std::sync::atomic::AtomicU32;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
+use std::thread;
 use std::time::Duration;
 use std_semaphore::Semaphore;
 
 fn main() {
     // solution_with_monitor();
-    solution_with_semaphore();
+    // solution_with_semaphore();
+    solution_with_sleep();
 }
 
 fn solution_with_monitor() {
@@ -90,6 +92,44 @@ fn solution_with_semaphore() {
                     }
                     _ => unreachable!(),
                 }
+            })
+        },
+        Some(Duration::from_millis(2000)),
+    );
+}
+
+// just use thread::sleep
+fn solution_with_sleep() {
+    let mut data = [1, 2, 3];
+    let mut ss = SliceShuffler::new(&mut data);
+    // we test 10 times
+    let mut r: Round<10> = Round::new();
+
+    r.start(
+        || {
+            let ans = Arc::new(AtomicU32::new(1));
+
+            ss.run(move |no| match no {
+                1 => {
+                    println!("print no {no}!");
+                    let ans = ans.fetch_add(1, Ordering::SeqCst);
+                    assert_eq!(no, ans);
+                }
+                2 => {
+                    thread::sleep(Duration::from_millis(50));
+
+                    println!("print no {no}!");
+                    let ans = ans.fetch_add(1, Ordering::SeqCst);
+                    assert_eq!(no, ans);
+                }
+                3 => {
+                    thread::sleep(Duration::from_millis(100));
+
+                    println!("print no {no}!");
+                    let ans = ans.fetch_add(1, Ordering::SeqCst);
+                    assert_eq!(no, ans);
+                }
+                _ => unreachable!(),
             })
         },
         Some(Duration::from_millis(2000)),
