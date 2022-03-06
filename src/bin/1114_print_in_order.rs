@@ -7,7 +7,12 @@ use std::sync::Arc;
 use std::time::Duration;
 
 fn main() {
-    let mut data = [1, 2, 3];
+	solution_with_monitor();
+}
+
+
+fn solution_with_monitor() {
+	let mut data = [1, 2, 3];
     let mut ss = SliceShuffler::new(&mut data);
     // we test 10 times
     let mut r: Round<10> = Round::new();
