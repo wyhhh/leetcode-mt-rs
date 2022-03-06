@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 rand = "*"
 std-semaphore = "0.1.0"
+crossbeam-utils = "*"
