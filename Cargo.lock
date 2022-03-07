@@ -17,7 +17,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "conc"
 version = "0.1.0"
-source = "git+https://github.com/wyhhh/conc.git#43cf311431e6a4cdae6d0bd850a349b7f83b96c7"
+source = "git+https://github.com/wyhhh/conc.git#47d59e5fd58b752cbf1b3c93cfe477f4b12aaaf2"
 dependencies = [
  "parking_lot",
 ]
