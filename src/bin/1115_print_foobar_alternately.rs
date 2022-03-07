@@ -1,5 +1,6 @@
 use std::sync::Barrier;
 
+// https://leetcode-cn.com/problems/print-foobar-alternately/
 fn main() {
     solution_with_barrier();
 }

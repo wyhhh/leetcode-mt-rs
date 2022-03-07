@@ -9,3 +9,5 @@ edition = "2021"
 rand = "*"
 std-semaphore = "0.1.0"
 crossbeam-utils = "*"
+crossbeam-channel = "*"
+conc = { git = "https://github.com/wyhhh/conc.git" }

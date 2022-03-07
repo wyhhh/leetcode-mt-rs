@@ -1,11 +1,13 @@
 use leetcode_mt_rs::Monitor;
 
+// https://leetcode-cn.com/problems/print-zero-even-odd/
 fn main() {
     solution_with_monitor();
 }
 
 fn solution_with_monitor() {
     const N: u32 = 20;
+    // we need a "turn" variable for tracking the right state of execution..
     enum Turn {
         Zero { last_is_odd: bool },
         Odd,
@@ -18,12 +20,14 @@ fn solution_with_monitor() {
             for _ in 0..N {
                 let mut g = m.m.lock().unwrap();
 
+                // whenver it isn't turn::zero, we wait
                 while !matches!(*g, Turn::Zero { .. }) {
                     g = m.cv.wait(g).unwrap();
                 }
 
                 println!("0");
 
+                // when we got here, update the state by `last_is_odd`
                 match *g {
                     Turn::Zero { last_is_odd } => {
                         if last_is_odd {
@@ -48,6 +52,7 @@ fn solution_with_monitor() {
 
                 println!("{n}");
 
+                // update next state which must be zero
                 *g = Turn::Zero { last_is_odd: false };
 
                 m.cv.notify_all();
@@ -63,6 +68,7 @@ fn solution_with_monitor() {
 
                 println!("{n}");
 
+                // update next state which must be zero
                 *g = Turn::Zero { last_is_odd: true };
 
                 m.cv.notify_all();

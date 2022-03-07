@@ -8,6 +8,7 @@ use std::thread;
 use std::time::Duration;
 use std_semaphore::Semaphore;
 
+// https://leetcode-cn.com/problems/print-in-order/
 fn main() {
     // solution_with_monitor();
     // solution_with_semaphore();
