@@ -66,6 +66,7 @@ dependencies = [
  "conc",
  "crossbeam-channel",
  "crossbeam-utils",
+ "parking_lot",
  "rand",
  "std-semaphore",
 ]

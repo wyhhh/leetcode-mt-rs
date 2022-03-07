@@ -10,4 +10,5 @@ rand = "*"
 std-semaphore = "0.1.0"
 crossbeam-utils = "*"
 crossbeam-channel = "*"
+parking_lot = "*"
 conc = { git = "https://github.com/wyhhh/conc.git" }

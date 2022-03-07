@@ -7,10 +7,11 @@ fn main() {
 }
 
 fn solution_with_sema() {
-    let h20 = make_h20(10);
+    let h20 = make_h20(4);
     // we just need two Semaphores, one for H, another for O
     let h = &Sema::new(2);
     let o = &Sema::new(2);
+    println!("answer:");
 
     crossbeam_utils::thread::scope(|s| {
         for k in h20 {
@@ -50,5 +51,10 @@ fn make_h20(n: usize) -> Vec<u8> {
 
     SliceShuffler::with_shuffle(&mut v);
 
+    println!("shuffled: ");
+    for x in &v {
+        print!("{}", *x as char);
+    }
+    println!("\n");
     v
 }

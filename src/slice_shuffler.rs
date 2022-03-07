@@ -35,7 +35,7 @@ impl<'a, T> SliceShuffler<'a, T> {
     {
         let mut handles = Vec::with_capacity(self.slice.len());
         self.shuffle();
-        println!("shuffle res: {:?}", self);
+        println!("shuffle result: {:?}", self);
 
         for x in &*self {
             let x = x.clone();
@@ -46,7 +46,7 @@ impl<'a, T> SliceShuffler<'a, T> {
 
         for h in handles {
             let res = h.join().unwrap();
-            println!("thread res: [[ {:?} ]]", res);
+            println!("thread result: [[ {:?} ]]", res);
         }
     }
 }

@@ -10,9 +10,9 @@ use std_semaphore::Semaphore;
 
 // https://leetcode-cn.com/problems/print-in-order/
 fn main() {
-    // solution_with_monitor();
+    solution_with_monitor();
     // solution_with_semaphore();
-    solution_with_sleep();
+    // solution_with_sleep();
 }
 
 fn solution_with_monitor() {
