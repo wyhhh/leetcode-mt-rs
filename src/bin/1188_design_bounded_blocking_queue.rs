@@ -56,14 +56,14 @@ trait BoundedBlockingQueue {
 }
 
 struct MonitorQueue {
-    monitor: parking_lot::Monitor<VecDeque<i32>>,
+    monitor: parking_lot::Monitor<Vec<i32>>,
     init_cap: usize,
 }
 
 impl BoundedBlockingQueue for MonitorQueue {
     fn new(cap: usize) -> Self {
         Self {
-            monitor: parking_lot::Monitor::new(VecDeque::with_capacity(cap)),
+            monitor: parking_lot::Monitor::new(Vec::with_capacity(cap)),
             init_cap: cap,
         }
     }
@@ -80,7 +80,7 @@ impl BoundedBlockingQueue for MonitorQueue {
 
             assert!(q.len() < self.init_cap);
 
-            q.push_back(ele);
+            q.push(ele);
 
             // dropped lock
         }
@@ -109,7 +109,7 @@ impl BoundedBlockingQueue for MonitorQueue {
                 self.monitor.c.wait(&mut q);
             }
 
-            q.pop_front().unwrap()
+            q.pop().unwrap()
             // unlock here
         };
 
