@@ -2,7 +2,32 @@ use std::sync::Barrier;
 
 // https://leetcode-cn.com/problems/print-foobar-alternately/
 fn main() {
-    solution_with_barrier();
+    // solution_with_barrier();
+	test();
+}
+
+fn test() {
+    let b = &Barrier::new(2);
+    let b2 = &Barrier::new(2);
+	let n = 5;
+
+    crossbeam_utils::thread::scope(|s| {
+		s.spawn(move |_| {
+			for _ in 0..n {
+				println!("foo");
+				b.wait();
+				b2.wait();
+			}
+
+		});
+		s.spawn(move |_| {
+			for _ in 0..n {
+				b.wait();
+				println!("bar");
+				b2.wait();
+			}
+		});
+	 }).unwrap();
 }
 
 fn solution_with_barrier() {

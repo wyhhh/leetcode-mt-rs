@@ -1,20 +1,47 @@
 use leetcode_mt_rs::round::Round;
 use leetcode_mt_rs::slice_shuffler::SliceShuffler;
 use leetcode_mt_rs::Monitor;
+use parking_lot::Condvar;
+use parking_lot::Mutex;
 use std::sync::atomic::AtomicU32;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use std_semaphore::Semaphore;
-use parking_lot::Mutex;
 
 // https://leetcode-cn.com/problems/print-in-order/
 fn main() {
     // solution_with_monitor();
     // solution_with_semaphore();
     // solution_with_sleep();
-	solution_with_mutex();
+    // solution_with_mutex();
+	condvar2();
+}
+
+fn condvar2() {
+    let m = &Mutex::new(1);
+    let c = &Condvar::new();
+
+    crossbeam_utils::thread::scope(|s| {
+        for no in 1..=10 {
+            s.spawn(move |_| {
+				let mut lock = m.lock();
+
+				while *lock != no {
+					c.wait(&mut lock);
+				}
+
+				println!("print {no}");
+				*lock += 1;
+
+				drop(lock);
+
+				c.notify_all();
+			});
+        }
+    })
+    .unwrap();
 }
 
 fn solution_with_monitor() {
@@ -41,6 +68,8 @@ fn solution_with_monitor() {
                 assert_eq!(no, ans);
 
                 *g += 1;
+
+
                 // every one who got the right anwser just notify others
                 monitor.cv.notify_all();
 
@@ -102,20 +131,21 @@ fn solution_with_semaphore() {
 }
 
 fn solution_with_mutex() {
-	let m = &Mutex::new(1);
+    let m = &Mutex::new(1);
 
-	crossbeam_utils::thread::scope(|s| {
-		for n in 1..=3 {
-			s.spawn(move |_| {
-				let mut no = m.lock();
+    crossbeam_utils::thread::scope(|s| {
+        for n in 1..=3 {
+            s.spawn(move |_| {
+                let mut no = m.lock();
 
-				if *no == n {
-					println!("{n} print!");
-					*no += 1;
-				}
-			});
-		}
-	}).unwrap();
+                if *no == n {
+                    println!("{n} print!");
+                    *no += 1;
+                }
+            });
+        }
+    })
+    .unwrap();
 }
 
 // just use thread::sleep

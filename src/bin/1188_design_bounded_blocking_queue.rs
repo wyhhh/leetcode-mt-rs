@@ -1,18 +1,43 @@
 use leetcode_mt_rs::parking_lot;
 use rand::thread_rng;
 use rand::Rng;
-use std::collections::VecDeque;
+use std::thread;
+use std::time::Duration;
 
 // https://leetcode-cn.com/problems/design-bounded-blocking-queue/
 fn main() {
     run(&MonitorQueue::new(20));
+
+	// let q = &MonitorQueue::new(1);
+
+	// crossbeam_utils::thread::scope(|s| {
+	// 	s.spawn(move |_| {
+	// 		thread::sleep(Duration::from_millis(200));
+	// 		q.enqueue(1);
+	// 	});
+	// 	s.spawn(move |_| {
+	// 		q.dequeue();
+	// 	});
+	// 	s.spawn(move |_| {
+	// 		thread::sleep(Duration::from_millis(200));
+	// 		q.enqueue(1);
+	// 	});
+	// 	s.spawn(move |_| {
+	// 		thread::sleep(Duration::from_millis(600));
+	// 		q.enqueue(1);
+	// 	});
+	// 	s.spawn(move |_| {
+	// 		thread::sleep(Duration::from_millis(800));
+	// 		q.enqueue(1);
+	// 	});
+	// 	}).unwrap();
 }
 
 fn run(q: &(impl BoundedBlockingQueue + Sync)) {
     let mut assert_size = 0;
 
     crossbeam_utils::thread::scope(|s| {
-        for (i, enqueue, n) in (1..=201).map(|x| {
+        for (i, enqueue, n) in (1..=11).map(|x| {
             let r = thread_rng().gen_range(-100..100);
             (x, x % 2 == 1, r)
         }) {
@@ -34,10 +59,12 @@ fn run(q: &(impl BoundedBlockingQueue + Sync)) {
 
             s.spawn(move |_| {
                 if enqueue {
+					thread::sleep(Duration::from_millis(50));
+                    println!("-> enqueue element: {n}");
                     q.enqueue(n);
                 } else {
                     let ele = q.dequeue();
-                    println!("dequeue element: {ele}");
+                    println!("<- dequeue element: {ele}");
                 }
             });
         }
@@ -71,34 +98,33 @@ impl BoundedBlockingQueue for MonitorQueue {
     fn enqueue(&self, ele: i32) {
         {
             let mut q = self.monitor.m.lock();
+			println!("enqueue coming!");
 
             // here we must use while avoiding other enqueue
             // got lock BUT the queue is full
             while q.len() == self.init_cap {
+				println!("enqueue waiting..");
                 self.monitor.c.wait(&mut q);
+				println!("---enqueue wakeup---");
             }
 
             assert!(q.len() < self.init_cap);
 
             q.push(ele);
+			println!("push ok");
 
             // dropped lock
         }
 
-        // because the q has just two state:
-        // => FULL, n enqueue threads are blocking maybe;
-        // => NON-FULL, m dequeue threads are blocking maybe
-        // but, if when at FULL state, the one of dequeue thread
-        // wakeup ALL the other threads, so the all BLOCKING
-        // enqueue threads are awaken. thus, when we call
-        // enqueue, there are likely some threads DEQUEUE blocking,
-        // we just notify one of it will be OK.
-        self.monitor.c.notify_one();
+		// thread::sleep(Duration::from_secs(1));
+        self.monitor.c.notify_all();
+		println!("enqueue wakeup one");
     }
 
     fn dequeue(&self) -> i32 {
         let ret = {
             let mut q = self.monitor.m.lock();
+			println!("dequeue coming!");
 
             // N.B. here must use whlie loop
             // because when a dequeue thread awaken
@@ -106,16 +132,19 @@ impl BoundedBlockingQueue for MonitorQueue {
             // had been awaken, but it is empty, so
             // next line would panic.
             while q.is_empty() {
+				println!("dequeue waiting..");
                 self.monitor.c.wait(&mut q);
+				println!("*** dequeue wake up ***");
             }
 
+			println!("pop ok");
             q.pop().unwrap()
             // unlock here
         };
 
-        // here we need notify all
         self.monitor.c.notify_all();
 
+		println!("dequeue wakeup one");
         ret
     }
 
