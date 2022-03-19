@@ -8,29 +8,29 @@ use std::time::Duration;
 fn main() {
     run(&MonitorQueue::new(20));
 
-	// let q = &MonitorQueue::new(1);
+    // let q = &MonitorQueue::new(1);
 
-	// crossbeam_utils::thread::scope(|s| {
-	// 	s.spawn(move |_| {
-	// 		thread::sleep(Duration::from_millis(200));
-	// 		q.enqueue(1);
-	// 	});
-	// 	s.spawn(move |_| {
-	// 		q.dequeue();
-	// 	});
-	// 	s.spawn(move |_| {
-	// 		thread::sleep(Duration::from_millis(200));
-	// 		q.enqueue(1);
-	// 	});
-	// 	s.spawn(move |_| {
-	// 		thread::sleep(Duration::from_millis(600));
-	// 		q.enqueue(1);
-	// 	});
-	// 	s.spawn(move |_| {
-	// 		thread::sleep(Duration::from_millis(800));
-	// 		q.enqueue(1);
-	// 	});
-	// 	}).unwrap();
+    // crossbeam_utils::thread::scope(|s| {
+    // 	s.spawn(move |_| {
+    // 		thread::sleep(Duration::from_millis(200));
+    // 		q.enqueue(1);
+    // 	});
+    // 	s.spawn(move |_| {
+    // 		q.dequeue();
+    // 	});
+    // 	s.spawn(move |_| {
+    // 		thread::sleep(Duration::from_millis(200));
+    // 		q.enqueue(1);
+    // 	});
+    // 	s.spawn(move |_| {
+    // 		thread::sleep(Duration::from_millis(600));
+    // 		q.enqueue(1);
+    // 	});
+    // 	s.spawn(move |_| {
+    // 		thread::sleep(Duration::from_millis(800));
+    // 		q.enqueue(1);
+    // 	});
+    // 	}).unwrap();
 }
 
 fn run(q: &(impl BoundedBlockingQueue + Sync)) {
@@ -59,7 +59,7 @@ fn run(q: &(impl BoundedBlockingQueue + Sync)) {
 
             s.spawn(move |_| {
                 if enqueue {
-					thread::sleep(Duration::from_millis(50));
+                    thread::sleep(Duration::from_millis(50));
                     println!("-> enqueue element: {n}");
                     q.enqueue(n);
                 } else {
@@ -98,33 +98,33 @@ impl BoundedBlockingQueue for MonitorQueue {
     fn enqueue(&self, ele: i32) {
         {
             let mut q = self.monitor.m.lock();
-			println!("enqueue coming!");
+            println!("enqueue coming!");
 
             // here we must use while avoiding other enqueue
             // got lock BUT the queue is full
             while q.len() == self.init_cap {
-				println!("enqueue waiting..");
+                println!("enqueue waiting..");
                 self.monitor.c.wait(&mut q);
-				println!("---enqueue wakeup---");
+                println!("---enqueue wakeup---");
             }
 
             assert!(q.len() < self.init_cap);
 
             q.push(ele);
-			println!("push ok");
+            println!("push ok");
 
             // dropped lock
         }
 
-		// thread::sleep(Duration::from_secs(1));
+        // thread::sleep(Duration::from_secs(1));
         self.monitor.c.notify_all();
-		println!("enqueue wakeup one");
+        println!("enqueue wakeup one");
     }
 
     fn dequeue(&self) -> i32 {
         let ret = {
             let mut q = self.monitor.m.lock();
-			println!("dequeue coming!");
+            println!("dequeue coming!");
 
             // N.B. here must use whlie loop
             // because when a dequeue thread awaken
@@ -132,19 +132,19 @@ impl BoundedBlockingQueue for MonitorQueue {
             // had been awaken, but it is empty, so
             // next line would panic.
             while q.is_empty() {
-				println!("dequeue waiting..");
+                println!("dequeue waiting..");
                 self.monitor.c.wait(&mut q);
-				println!("*** dequeue wake up ***");
+                println!("*** dequeue wake up ***");
             }
 
-			println!("pop ok");
+            println!("pop ok");
             q.pop().unwrap()
             // unlock here
         };
 
         self.monitor.c.notify_all();
 
-		println!("dequeue wakeup one");
+        println!("dequeue wakeup one");
         ret
     }
 

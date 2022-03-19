@@ -16,7 +16,7 @@ fn main() {
     // solution_with_semaphore();
     // solution_with_sleep();
     // solution_with_mutex();
-	condvar2();
+    condvar2();
 }
 
 fn condvar2() {
@@ -26,19 +26,19 @@ fn condvar2() {
     crossbeam_utils::thread::scope(|s| {
         for no in 1..=10 {
             s.spawn(move |_| {
-				let mut lock = m.lock();
+                let mut lock = m.lock();
 
-				while *lock != no {
-					c.wait(&mut lock);
-				}
+                while *lock != no {
+                    c.wait(&mut lock);
+                }
 
-				println!("print {no}");
-				*lock += 1;
+                println!("print {no}");
+                *lock += 1;
 
-				drop(lock);
+                drop(lock);
 
-				c.notify_all();
-			});
+                c.notify_all();
+            });
         }
     })
     .unwrap();
@@ -68,7 +68,6 @@ fn solution_with_monitor() {
                 assert_eq!(no, ans);
 
                 *g += 1;
-
 
                 // every one who got the right anwser just notify others
                 monitor.cv.notify_all();

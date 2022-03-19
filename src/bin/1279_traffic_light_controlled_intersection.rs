@@ -1,7 +1,7 @@
+use leetcode_mt_rs::slice_shuffler::SliceShuffler;
 use parking_lot::Mutex;
 use rand::thread_rng;
 use rand::Rng;
-use leetcode_mt_rs::slice_shuffler::SliceShuffler;
 
 fn main() {
     solution_with_mutex();
@@ -30,14 +30,14 @@ fn solution_with_mutex() {
 
 struct Cars {
     amt: u32,
-	ids: Vec<u32>,
+    ids: Vec<u32>,
 }
 
 impl Cars {
     fn new(amt: u32) -> Self {
-		let mut ids: Vec<u32> = (1..=amt).collect();
-		SliceShuffler::with_shuffle(&mut ids);
-			
+        let mut ids: Vec<u32> = (1..=amt).collect();
+        SliceShuffler::with_shuffle(&mut ids);
+
         Self { amt, ids }
     }
 }
@@ -51,12 +51,9 @@ impl Iterator for Cars {
             None
         } else {
             self.amt -= 1;
-			let id = unsafe {self.ids.get_unchecked(self.amt as usize)};
+            let id = unsafe { self.ids.get_unchecked(self.amt as usize) };
 
-            Some((
-				*id,
-                thread_rng().gen_range(1..=4),
-            ))
+            Some((*id, thread_rng().gen_range(1..=4)))
         }
     }
 }
