@@ -7,12 +7,14 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 use std_semaphore::Semaphore;
+use parking_lot::Mutex;
 
 // https://leetcode-cn.com/problems/print-in-order/
 fn main() {
-    solution_with_monitor();
+    // solution_with_monitor();
     // solution_with_semaphore();
     // solution_with_sleep();
+	solution_with_mutex();
 }
 
 fn solution_with_monitor() {
@@ -97,6 +99,23 @@ fn solution_with_semaphore() {
         },
         Some(Duration::from_millis(2000)),
     );
+}
+
+fn solution_with_mutex() {
+	let m = &Mutex::new(1);
+
+	crossbeam_utils::thread::scope(|s| {
+		for n in 1..=3 {
+			s.spawn(move |_| {
+				let mut no = m.lock();
+
+				if *no == n {
+					println!("{n} print!");
+					*no += 1;
+				}
+			});
+		}
+	}).unwrap();
 }
 
 // just use thread::sleep
