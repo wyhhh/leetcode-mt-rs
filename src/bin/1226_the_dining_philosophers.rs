@@ -5,10 +5,10 @@ use std::time::Duration;
 
 // https://leetcode-cn.com/problems/the-dining-philosophers/
 fn main() {
-    // deallock_error_demonstration_with_mutex();
+    // deadlock_error_demonstration_with_mutex();
     // solution_with_mutexes_and_sema();
-    // solution_with_serialization();
-    soluation_with_first_do_once();
+    solution_with_serialization();
+    // soluation_with_first_do_once();
 }
 
 /// when each one all gets the left or right fork, it will be deadlock 😒
@@ -23,7 +23,7 @@ fn deadlock_error_demonstration_with_mutex() {
                 // get right hand fork index of philosopher
                 let right = || if i == 0 { 4 } else { i - 1 };
 
-                for _ in 0..3 {
+                for _ in 0..1 {
                     let left = forks[i].lock();
                     println!("--- {i} get LEFT fork! ---");
 
@@ -67,7 +67,7 @@ fn solution_with_mutexes_and_sema() {
                 // get right hand fork index of philosopher
                 let right = || if i == 0 { 4 } else { i - 1 };
 
-                for _ in 0..50 {
+                for _ in 0..100 {
                     // the max permits is four, so when
                     // the fifth one wants to coming, it
                     // should be blocked.
@@ -77,16 +77,6 @@ fn solution_with_mutexes_and_sema() {
                     println!("--- {i}({philosopher}) get LEFT fork! ---");
 
                     let right = forks[right()].lock();
-                    // but, when some thread get the last remaining right lock
-                    // it acquires, and thus go ahead, the two locks in it
-                    // will be released, and the procedure get going on.
-                    // what a wonderful design! LOL :)
-
-                    // whatever, when that is not going to one-shot get
-                    // five permits, the permits will be always greater
-                    // than one, there is always at least one door opening
-                    // for threads going on.
-                    sema.release();
 
                     println!("--- {i}({philosopher}) get RIGHT fork! ---");
 
@@ -97,6 +87,17 @@ fn solution_with_mutexes_and_sema() {
 
                     drop(right);
                     println!("=== {i}({philosopher}) put RIGHT fork! ===\n");
+
+                    // but, when some thread get the last remaining right lock
+                    // it acquires, and thus go ahead, the two locks in it
+                    // will be released, and the procedure get going on.
+                    // what a wonderful design! LOL :)
+
+                    // whatever, when that is not going to one-shot get
+                    // five permits, the permits will be always greater
+                    // than one, there is always at least one door opening
+                    // for threads going on.
+                    sema.release();
 
                     // synchronize each philosopher
                     let last = b.wait();
@@ -140,7 +141,8 @@ fn soluation_with_first_do_once() {
                     println!("=== {i} put RIGHT fork! ===\n");
                 };
 
-                for _ in 0..1 {
+				
+                for _ in 0..2 {
                     if i == 0 {
                         // std::thread::sleep(Duration::from_secs(1));
 
@@ -189,7 +191,7 @@ fn solution_with_serialization() {
     crossbeam_utils::thread::scope(|s| {
         for i in 0..5 {
             s.spawn(move |_| {
-                for _ in 0..2 {
+                for _ in 0..1 {
                     {
                         let _g = lock.lock();
                         println!("--- {i} get LEFT fork! ---");

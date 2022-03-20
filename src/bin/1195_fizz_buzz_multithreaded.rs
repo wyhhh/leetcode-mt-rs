@@ -11,7 +11,7 @@ fn solution_with_barrier() {
     crossbeam_utils::thread::scope(|s| {
         for no in 1..=4 {
             s.spawn(move |_| {
-                for n in 1..=15 {
+                for n in 1..=30 {
                     match no {
                         1 => {
                             if n % 3 == 0 && n % 5 != 0 {
